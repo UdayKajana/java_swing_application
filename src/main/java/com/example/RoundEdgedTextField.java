@@ -39,7 +39,7 @@ public class RoundEdgedTextField extends JTextField {
             int diameter = Math.min(width, height);
 
             if (isFocusOwner()) {
-                g2.setColor(new Color(100, 100, 100));
+                g2.setColor(new Color(100,100,100));
             } else {
                 g2.setColor(new Color(150, 150, 150));
             }
