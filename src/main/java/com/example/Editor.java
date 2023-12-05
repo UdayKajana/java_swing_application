@@ -14,22 +14,19 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 public class Editor {
-    int index = 0;
     static JPanel home;
     static JsonNode jsonNode = null;
     static ObjectNode objectNode = null;
+    IndentPanel indentLevel1 = null;
+    int index = 0;
     StringBuilder json = new StringBuilder();
-    Map<JPanel, ArrayList<JPanel>> parents = new LinkedHashMap<>();
     int count = 0;
+    ArrayList indentBlocks = new ArrayList();
     ComponentProvider componentProvider = new ComponentProvider();
 
     public Editor() {
-        parents.put(home, new ArrayList<>());
-        parents.get(home).add(componentProvider.getHomePanel());
         home = componentProvider.getHomePanel();
         refresh(home);
         home.setVisible(true);
@@ -64,18 +61,13 @@ public class Editor {
         });
 
         btnSave.addActionListener(e -> {
-            try {
-                printJson();
-            } catch (JsonProcessingException ex) {
-                throw new RuntimeException(ex);
-            }
+            printStatus(indentLevel1);
         });
     }
 
     public void generateJsonPanel(String absolutePath) {
-//        System.out.println("Selected JSON file: " + absolutePath);
-//        System.out.println("Generating Json Panel...");
         JPanel jsonPanel = componentProvider.getJsonPanel();
+        refresh(jsonPanel);
         home.add(jsonPanel);
         refresh(home);
         StringBuilder fileBuilder = new StringBuilder();
@@ -88,7 +80,13 @@ public class Editor {
             bufferedReader.close();
             jsonNode = new ObjectMapper().readTree(fileBuilder.toString());
             objectNode = (ObjectNode) jsonNode;
-            constructGUI(jsonPanel, jsonNode, 1);
+            indentLevel1 = new IndentPanel(jsonPanel, 1);
+            jsonPanel.add(indentLevel1.getIndentPanel());
+            refresh(jsonPanel);
+            refresh(indentLevel1.getIndentPanel());
+            constructGUI(indentLevel1, jsonNode, 1);
+            jsonPanel.add(indentLevel1.getIndentPanel());
+            refresh(jsonPanel);
 
         } catch (JsonProcessingException e) {
             System.out.println("JsonProcessingException occurred" + e);
@@ -106,36 +104,28 @@ public class Editor {
         panel.setVisible(true);
     }
 
-    public void constructGUI(JPanel parent, JsonNode jsonNode, int indent) {
+    public void constructGUI(IndentPanel indentPanel, JsonNode jsonNode, int indent) {
         if (jsonNode.isObject()) {
             jsonNode.fields().forEachRemaining(entry -> {
                 count++;
                 JsonNode value = entry.getValue();
                 if (value.isObject() || value.isArray()) {
-                    if (!parents.containsKey(parent)) {
-                        parents.put(parent, new ArrayList<>());
-                        parents.get(parent).add(componentProvider.getIndentPanel(indent));
-                        int index = 0;
-                    }
-                    JPanel vPanel = componentProvider.getIndentPanel(indent);
-                    JPanel panel = componentProvider.getPropertyPanel(index++,jsonNode,'"'+entry.getKey()+'"', "", true);
-                    vPanel.add(panel);
-                    parents.put(vPanel, new ArrayList<>());
-                    parents.get(vPanel).add(panel);
-                    parent.add(vPanel);
-                    refresh(vPanel);
-                    refresh(parent);
-                    constructGUI(vPanel, value, indent + 1);
+                    PropertyPanel propertyPanel = new PropertyPanel(indentPanel, index++, jsonNode, '"' + entry.getKey() + '"', "", true);
+                    IndentPanel indentPanel1 = new IndentPanel(indentPanel, indent);
+                    indentPanel.addIndentPanel(indentPanel1);
+                    indentBlocks.add(indentPanel1);
+                    constructGUI(indentPanel1, value, indent + 1);
                 } else {
-                    JPanel panel = componentProvider.getPropertyPanel(0, jsonNode, '"'+entry.getKey()+'"', String.valueOf(value), false);
-                    parent.add(panel);
-                    refresh(parent);
+                    PropertyPanel propertyPanel1 = new PropertyPanel(indentPanel, 0, jsonNode, '"' + entry.getKey() + '"', String.valueOf(value), false);
+                    JPanel panel = propertyPanel1.getPropertyPanel();
+                    refresh(panel);
+                    indentPanel.refresh();
                 }
             });
         } else if (jsonNode.isArray()) {
             for (JsonNode element : jsonNode) {
                 if (element.isObject() || element.isArray()) {
-                    constructGUI(parent, element, indent);
+                    constructGUI(indentPanel, element, indent);
                 } else {
                     System.out.println(" ".repeat(indent) + element);
                     count++;
@@ -144,33 +134,33 @@ public class Editor {
         }
     }
 
-    public void printJson() throws JsonProcessingException {
-       if(objectNode!=null){
-           System.out.println(new ObjectMapper().writeValueAsString(objectNode));
-       }
-       else {
-           System.out.println("object is null");
-       }
-    }
-
-/*    public void buildJSON(JPanel panel, boolean addBrace, int indent) {
+    public void buildJSON(JPanel panel, boolean addBrace, int indent) {
         Component[] components = panel.getComponents();
-        for (int i=0;i<components.length;i++) {
-            if (components[i] instanceof JPanel) {
-                if (components[i].getName().startsWith("PAN_PROP")) {
-                    json.append(getLine((JPanel) components[i],addBrace, i!=components.length-1,indent));
-                    addBrace = false;
-                } else if (components[i].getName().startsWith("PAN_INDENT")) {
-                    buildJSON(
-                            (JPanel) components[i],
-                            consistsMultipleIndentPans((JPanel) components[i]),
-                            indent + 1);
-                } else {
-                    System.out.println("END");
-                }
+        //System.out.println("Parent =" + panel.getName());
+        for (Component c : components) {
+            if (!(c instanceof JPanel)) {
+                //System.out.println("child =" + panel.getName());
+            } else {
+                buildJSON(((JPanel) c), false, indent + 1);
             }
         }
-        json.append("},\n");
+
+//        for (int i=0;i<components.length;i++) {
+//            if (components[i] instanceof JPanel) {
+//                if (components[i].getName().startsWith("PAN_PROP")) {
+//                    json.append(getLine((JPanel) components[i],addBrace, i!=components.length-1,indent));
+//                    addBrace = false;
+//                } else if (components[i].getName().startsWith("PAN_INDENT")) {
+//                    buildJSON(
+//                            (JPanel) components[i],
+//                            consistsMultipleIndentPans((JPanel) components[i]),
+//                            indent + 1);
+//                } else {
+//                    System.out.println("END");
+//                }
+//            }
+//        }
+//        json.append("},\n");
     }
 
     private StringBuilder getLine(JPanel panel, boolean addBrace, boolean addComma, int indent) {
@@ -185,7 +175,7 @@ public class Editor {
         }
         if (addBrace) line.append("[\n");
         if (count == 2) line.append("{\n");
-        else line.insert(line.length() - 1, addComma?",\n":"\n");
+        else line.insert(line.length() - 1, addComma ? ",\n" : "\n");
         return new StringBuilder(" ".repeat(indent)).append(line);
     }
 
@@ -196,7 +186,12 @@ public class Editor {
             count = component instanceof JPanel && component.getName().startsWith("PAN_INDENT") ? count + 1 : count;
         }
         return count >= 1;
-    }*/
+    }
 
+    private void printStatus(IndentPanel indentPanel) {
+        StringBuilder sb = new StringBuilder("{");
+        sb.append(indentLevel1.getContents());
+        System.out.println(sb.toString());
+    }
 }
 
