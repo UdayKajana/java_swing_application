@@ -1,7 +1,6 @@
 package com.example;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -18,41 +17,68 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
-import static com.example.Editor.objectNode;
 
 public class ComponentProvider {
-
-    static ArrayList<Color> colorPalette = new ArrayList<>();
+    static List<Color> colorPalette = Arrays.asList(
+            new Color(156, 39, 176),
+            new Color(255, 193, 7),
+            new Color(76, 175, 80),
+            new Color(0, 188, 212),
+            new Color(233, 30, 99),
+            new Color(96, 125, 139),
+            new Color(255, 152, 0),
+            new Color(0, 150, 136),
+            new Color(103, 58, 183),
+            new Color(255, 160, 0),
+            new Color(121, 85, 72),
+            new Color(255, 202, 40),
+            new Color(244, 67, 54)
+    );
+    /*    List<Color> colorPalette = new ArrayList<>(Arrays.asList(
+                new Color(156, 39, 176),   // Purple
+                new Color(255, 193, 7),    // Amber
+                new Color(76, 175, 80),    // Green
+                new Color(0, 188, 212),    // Cyan
+                new Color(233, 30, 99),    // Pink
+                new Color(96, 125, 139),   // Blue Gray
+                new Color(255, 152, 0),    // Deep Orange
+                new Color(0, 150, 136),    // Tea
+                new Color(103, 58, 183),   // Deep Purple
+                new Color(255, 160, 0),    // Orange
+                new Color(121, 85, 72),    // Brown
+                new Color(255, 202, 40),   // Yellow
+                new Color(244, 67, 54)     // Red
+        ));*/
+/*    static ArrayList<Color> colorPalette = List.of(
+            new Color(156, 39, 176),   // Purple
+            new Color(255, 193, 7),    // Amber
+            new Color(76, 175, 80),    // Green
+            new Color(0, 188, 212),    // Cyan
+            new Color(233, 30, 99),    // Pink
+            new Color(96, 125, 139),   // Blue Gray
+            new Color(255, 152, 0),    // Deep Orange
+            new Color(0, 150, 136),    // Tea
+            new Color(103, 58, 183),   // Deep Purple
+            new Color(255, 160, 0),    // Orange
+            new Color(121, 85, 72),    // Brown
+            new Color(255, 202, 40),   // Yellow
+            new Color(244, 67, 54)     // Red
+    );*/
     static Color KEY = new Color(156, 220, 254);
     static Color BACKGROUND = new Color(30, 30, 30);
     static Color VALUE = new Color(206, 145, 120);
     static int seq = 0;
     static float indentGap = 0;
     static JPanel PANEL_FILE = null, PANEL_JSON = null/*, PANEL_ERROR = null*/;
+    Component headComponnt, tailComponent;
     Map<JTextField, String> details = new LinkedHashMap<JTextField, String>();
     int colorSeq = 0;
     JPanel homePanel = null;
-
-    public ComponentProvider() {
-        colorPalette.add(new Color(156, 39, 176));      // Purple
-        colorPalette.add(new Color(255, 193, 7));       // Amber
-        colorPalette.add(new Color(76, 175, 80));       // Green
-        colorPalette.add(new Color(0, 188, 212));       // Cyan
-        colorPalette.add(new Color(233, 30, 99));       // Pink
-        colorPalette.add(new Color(96, 125, 139));      // Blue Gray
-        colorPalette.add(new Color(255, 152, 0));       // Deep Orange
-        colorPalette.add(new Color(0, 150, 136));      // Tea
-        colorPalette.add(new Color(103, 58, 183));     // Deep Purple
-        colorPalette.add(new Color(255, 160, 0));      // Orange
-        colorPalette.add(new Color(121, 85, 72));      // Brown
-        colorPalette.add(new Color(255, 202, 40));     // Yellow
-        colorPalette.add(new Color(244, 67, 54));      //Red
-    }
 
     public JPanel getHomePanel() {
         if (homePanel == null) {
@@ -60,13 +86,15 @@ public class ComponentProvider {
             homeFrame.setLayout(new BoxLayout(homeFrame.getContentPane(), BoxLayout.Y_AXIS));
             homeFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            homeFrame.setBackground(BACKGROUND);
             homeFrame.setSize((int) screenSize.getWidth(), (int) screenSize.getHeight());
-            homePanel = getIndentPanel(1);
             indentGap = (float) screenSize.getWidth() / 50;
+            homePanel = new JPanel();
             homePanel.setSize((int) screenSize.getWidth(), (int) screenSize.getHeight());
             homePanel.setLayout(new BoxLayout(homePanel, BoxLayout.Y_AXIS));
             homePanel.setBorder(new LineBorder(colorPalette.get(((colorSeq++) % colorPalette.size())), 0));
-            //homePanel.setName("PAN_HOME");
+            homePanel.setBackground(BACKGROUND);
+            homePanel.setName("Home");
             JScrollPane homeScrollPane = getScrollablePane(homePanel);
             homeFrame.add(homeScrollPane);
             homeFrame.setVisible(true);
@@ -74,37 +102,25 @@ public class ComponentProvider {
         return homePanel;
     }
 
-    public JPanel getIndentPanel(int indent) {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createEmptyBorder(2, (int) (indentGap * indent), 2, 0),
-                BorderFactory.createLineBorder(colorPalette.get(((colorSeq++) % colorPalette.size())))));
-        panel.setAlignmentX(1);
-        panel.setBackground(ComponentProvider.BACKGROUND);
-        panel.add(Box.createHorizontalGlue());
-        //panel.setName("PAN_INDENT" + seq++);
-        panel.setVisible(true);
-        return panel;
-    }
 
     public JPanel getPropertyPanel(int index, JsonNode jsonNode, String key, String value, boolean isALabel) {
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        panel.setBackground(ComponentProvider.BACKGROUND);
+        panel.setBackground(BACKGROUND);
         panel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 200));
         panel.add(Box.createHorizontalGlue());
         panel.setVisible(true);
         panel.setBorder(null);
+        panel.setName("Property");
         if (!isALabel) {
             panel.add(new JLabel(""));
         }
         JTextField keyField = getKVTextField(index, jsonNode, key, value, true, true);
         JTextField dotField = getKVTextField(index, jsonNode, key, " : ", false, false);
         JTextField valueField = getKVTextField(index, jsonNode, key, value, false, !isALabel);
-        keyField.putClientProperty("valueTF",valueField);
-        valueField.putClientProperty("keyTF",keyField);
-        keyField.putClientProperty("jsonNode",jsonNode);
+        keyField.putClientProperty("valueTF", valueField);
+        valueField.putClientProperty("keyTF", keyField);
+        keyField.putClientProperty("jsonNode", jsonNode);
         valueField.putClientProperty("jsonNode", jsonNode);
         panel.add(keyField);
         panel.add(dotField);
@@ -112,14 +128,47 @@ public class ComponentProvider {
         return panel;
     }
 
+/*    private void refresh(JTextField keyField) {
+        keyField.revalidate();
+        keyField.repaint();
+        keyField.setVisible(true);
+    }*/
+
+    /*    private void refresh(JPanel panel) {
+            panel.revalidate();
+            panel.repaint();
+            panel.setVisible(true);
+        }
+        private void assignnext(JPanel panel) {
+            if(headComponnt == null)
+            {
+                headComponnt = panel;
+                tailComponent = panel;
+            }
+            else {
+                ((JPanel) tailComponent).putClientProperty("next", panel);
+                ((JPanel) tailComponent).putClientProperty("start", "{");
+                tailComponent = panel;
+            }
+        }
+        private void assignnext(JTextField textField,boolean isKey) {
+            if(headComponnt == null){
+                headComponnt = tailComponent = textField;
+            }
+            else {
+                ((JTextField) tailComponent).putClientProperty("next", textField);
+                ((JTextField) tailComponent).putClientProperty("type", isKey);
+                tailComponent = textField;
+            }
+        }*/
     public JPanel getFilePanel() {
         if (ComponentProvider.PANEL_FILE == null) {
             PANEL_FILE = new JPanel();
-            PANEL_FILE.setBackground(ComponentProvider.BACKGROUND);
+            PANEL_FILE.setBackground(BACKGROUND);
             PANEL_FILE.setLayout(new BoxLayout(PANEL_FILE, BoxLayout.X_AXIS));
             PANEL_FILE.setMaximumSize(new Dimension(Integer.MAX_VALUE, 70));
             PANEL_FILE.setBorder(new EmptyBorder(20, 20, 20, 20));
-            //PANEL_FILE.setName("PAN_FILE");
+            PANEL_FILE.setName("File");
             PANEL_FILE.setVisible(true);
         }
         return PANEL_FILE;
@@ -127,8 +176,12 @@ public class ComponentProvider {
 
     public JPanel getJsonPanel() {
         if (ComponentProvider.PANEL_JSON == null) {
-            PANEL_JSON = getIndentPanel(1);
-            //PANEL_JSON.setName("PAN_JSON");
+            PANEL_JSON = new JPanel();
+            PANEL_JSON.setBackground(BACKGROUND);
+            PANEL_JSON.setLayout(new BoxLayout(PANEL_JSON, BoxLayout.X_AXIS));
+            PANEL_JSON.setBorder(new EmptyBorder(20, 20, 20, 20));
+            PANEL_JSON.setName("File");
+            PANEL_JSON.setVisible(true);
         }
         return PANEL_JSON;
     }
@@ -136,7 +189,8 @@ public class ComponentProvider {
     public JTextField getKVTextField(int index, JsonNode jsonNode, String key, String value, boolean isKey, boolean editable) {
         JTextField textField = new JTextField();
         textField.setEditable(editable);
-        if(isKey) textField.setText(key);
+        textField.setName("kdv");
+        if (isKey) textField.setText(key);
         else textField.setText(value);
         textField.setAlignmentX(1);
         textField.setBorder(null);
@@ -190,21 +244,21 @@ public class ComponentProvider {
                 }
 
                 private void updateJsonObject() {
-                    if(jsonNode.isObject()){
+                    if (jsonNode.isObject()) {
                         ObjectNode objectNode1 = (ObjectNode) jsonNode;
                         String presentKey = (key.length() >= 2 && key.startsWith("\"") && key.endsWith("\"")) ? key.substring(1, key.length() - 1) : key;
                         JsonNode child = objectNode1.get(presentKey);
                         if (isKey) {
                             objectNode1.remove(presentKey);
                             String updatedKey = (textField.getText().length() >= 2 && textField.getText().startsWith("\"") && textField.getText().endsWith("\"")) ? textField.getText().substring(1, textField.getText().length() - 1) : textField.getText();
-                            textField.putClientProperty("key",updatedKey);
+                            textField.putClientProperty("key", updatedKey);
                             ObjectNode keyValueNode = JsonNodeFactory.instance.objectNode();
                             keyValueNode.set(updatedKey, child);
                             System.out.println("index = " + index);
                         } else {
                             String v = textField.getText();
                             v = (v.length() >= 2 && v.startsWith("\"") && v.endsWith("\"")) ? v.substring(1, v.length() - 1) : v;
-                            textField.putClientProperty("value",v);
+                            textField.putClientProperty("value", v);
                             JsonNode jsonNode = TextNode.valueOf(v);
                             objectNode1.set(presentKey, jsonNode);
                             System.out.println("index = " + index);
@@ -241,7 +295,7 @@ public class ComponentProvider {
         RoundEdgedButton roundEdgedButton = new RoundEdgedButton(text);
         roundEdgedButton.setBackground(bgColor);
         roundEdgedButton.setForeground(fgColor);
-        //roundEdgedButton.setName(text);
+        roundEdgedButton.setName(text);
         roundEdgedButton.setVisible(true);
         return roundEdgedButton;
     }
@@ -251,8 +305,8 @@ public class ComponentProvider {
         roundEdgedTextField.setBackground(new Color(54, 69, 79));
         roundEdgedTextField.setForeground(Color.BLUE);
         roundEdgedTextField.setFont(new Font("Verdana", Font.BOLD, 16));
-        //roundEdgedTextField.setBorder(new LineBorder(new Color(54, 69, 79), 2));
-        //roundEdgedTextField.setName("TF_" + text.replace(" ", "_"));
+        roundEdgedTextField.setBorder(new LineBorder(new Color(54, 69, 79), 2));
+        roundEdgedTextField.setName("TF_" + text.replace(" ", "_"));
         roundEdgedTextField.setVisible(true);
         return roundEdgedTextField;
     }
@@ -263,7 +317,7 @@ public class ComponentProvider {
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         JScrollBar verticalScrollBar = scrollPane.getVerticalScrollBar();
 //        verticalScrollBar.addAdjustmentListener(new CustomScrollSpeedAdjustmentListener());
-        //scrollPane.setName(("PANS_" + seq++).replace(" ", "_"));
+        scrollPane.setName(("PANS_" + seq++).replace(" ", "_"));
         return scrollPane;
     }
 
