@@ -1,4 +1,4 @@
-package com.example;
+package com.jeditor;
 
 import javax.swing.*;
 import java.awt.*;

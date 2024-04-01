@@ -1,4 +1,4 @@
-package com.example;
+package com.jeditor;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -15,7 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import static com.example.ComponentProvider.BACKGROUND;
+import static com.jeditor.ComponentProvider.BACKGROUND;
 
 public class PropertyPanel {
     boolean isALable = false;

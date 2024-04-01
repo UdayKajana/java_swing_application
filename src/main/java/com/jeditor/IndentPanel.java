@@ -1,11 +1,11 @@
-package com.example;
+package com.jeditor;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 
-import static com.example.ComponentProvider.BACKGROUND;
+import static com.jeditor.ComponentProvider.BACKGROUND;
 
 public class IndentPanel {
     private static int colorSeq = 0;

@@ -1,4 +1,4 @@
-package com.example;
+package com.jeditor;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
@@ -39,36 +39,6 @@ public class ComponentProvider {
             new Color(255, 202, 40),
             new Color(244, 67, 54)
     );
-    /*    List<Color> colorPalette = new ArrayList<>(Arrays.asList(
-                new Color(156, 39, 176),   // Purple
-                new Color(255, 193, 7),    // Amber
-                new Color(76, 175, 80),    // Green
-                new Color(0, 188, 212),    // Cyan
-                new Color(233, 30, 99),    // Pink
-                new Color(96, 125, 139),   // Blue Gray
-                new Color(255, 152, 0),    // Deep Orange
-                new Color(0, 150, 136),    // Tea
-                new Color(103, 58, 183),   // Deep Purple
-                new Color(255, 160, 0),    // Orange
-                new Color(121, 85, 72),    // Brown
-                new Color(255, 202, 40),   // Yellow
-                new Color(244, 67, 54)     // Red
-        ));*/
-/*    static ArrayList<Color> colorPalette = List.of(
-            new Color(156, 39, 176),   // Purple
-            new Color(255, 193, 7),    // Amber
-            new Color(76, 175, 80),    // Green
-            new Color(0, 188, 212),    // Cyan
-            new Color(233, 30, 99),    // Pink
-            new Color(96, 125, 139),   // Blue Gray
-            new Color(255, 152, 0),    // Deep Orange
-            new Color(0, 150, 136),    // Tea
-            new Color(103, 58, 183),   // Deep Purple
-            new Color(255, 160, 0),    // Orange
-            new Color(121, 85, 72),    // Brown
-            new Color(255, 202, 40),   // Yellow
-            new Color(244, 67, 54)     // Red
-    );*/
     static Color KEY = new Color(156, 220, 254);
     static Color BACKGROUND = new Color(30, 30, 30);
     static Color VALUE = new Color(206, 145, 120);
@@ -127,40 +97,6 @@ public class ComponentProvider {
         panel.add(valueField);
         return panel;
     }
-
-/*    private void refresh(JTextField keyField) {
-        keyField.revalidate();
-        keyField.repaint();
-        keyField.setVisible(true);
-    }*/
-
-    /*    private void refresh(JPanel panel) {
-            panel.revalidate();
-            panel.repaint();
-            panel.setVisible(true);
-        }
-        private void assignnext(JPanel panel) {
-            if(headComponnt == null)
-            {
-                headComponnt = panel;
-                tailComponent = panel;
-            }
-            else {
-                ((JPanel) tailComponent).putClientProperty("next", panel);
-                ((JPanel) tailComponent).putClientProperty("start", "{");
-                tailComponent = panel;
-            }
-        }
-        private void assignnext(JTextField textField,boolean isKey) {
-            if(headComponnt == null){
-                headComponnt = tailComponent = textField;
-            }
-            else {
-                ((JTextField) tailComponent).putClientProperty("next", textField);
-                ((JTextField) tailComponent).putClientProperty("type", isKey);
-                tailComponent = textField;
-            }
-        }*/
     public JPanel getFilePanel() {
         if (ComponentProvider.PANEL_FILE == null) {
             PANEL_FILE = new JPanel();
